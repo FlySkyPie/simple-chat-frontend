@@ -24,6 +24,7 @@
     width       : 100%;
     flex-grow   : 1;
     //height    : 100%;
+    min-height  : 50vh;
     //height    : calc(90vh - 100px);
     overflow-y  : scroll;
 }

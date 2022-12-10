@@ -1,48 +1,27 @@
 import { useRef, useState } from 'react'
-import { Input, MessageList, MessageType } from 'react-chat-elements';
+import { Input, MessageList, } from 'react-chat-elements';
 import 'react-chat-elements/dist/main.css'
 
+import { useTextCompletion } from './openai';
+import { useChartHistory } from './store';
 import styles from './styles.module.scss';
 
-const sampleMessage: MessageType = {
-  id: 1,
-  position: 'right',
-  type: 'text',
-  text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit',
-  date: new Date(),
-  focus: false,
-  titleColor: '#000000',
-  forwarded: false,
-  notch: false,
-  removeButton: false,
-  replyButton: false,
-  retracted: false,
-  status: 'received',
-  title: '',
-};
-
 function App() {
+  const { charts, addHumanMsg, addRebotMsg } = useChartHistory();
+  const { request } = useTextCompletion();
   const [disableEnterSend, setDisableEnterSend] = useState(false);
-  const inputRef = useRef<Input>(null);
   const messageListReferance = useRef();
 
   return (
     <div className={styles.app}>
       <div className={styles.container}>
-
         <MessageList
           referance={messageListReferance}
           className={styles.msgBox}
           //className='message-list'
           lockable={true}
           toBottomHeight={'100%'}
-          dataSource={[
-            sampleMessage, sampleMessage, sampleMessage, sampleMessage,
-            sampleMessage, sampleMessage, sampleMessage, sampleMessage,
-            sampleMessage, sampleMessage, sampleMessage
-
-
-          ]} />
+          dataSource={charts} />
         <Input
           className={styles.input}
           multiline
@@ -64,15 +43,20 @@ function App() {
 
             if (event.key === 'Enter') {
               const element = event.currentTarget as HTMLTextAreaElement;
-              console.log(element.value)
 
+              if (element.value === '') {
+                return;
+              }
+
+              addHumanMsg(element.value);
+              request(element.value).then(result => {
+                addRebotMsg(result);
+              })
+              //addRebotMsg('This is echo: ' + element.value)
               element.value = '';
 
               event.preventDefault();
             }
-
-
-            console.log(event.key)
           }}
           onSubmit={() => {
             console.log('submit');
