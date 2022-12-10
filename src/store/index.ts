@@ -46,7 +46,7 @@ export const useChartHistory = create<IChartHistory>((set) => ({
                 id: nanoid(),
                 date: new Date(),
                 position: 'left',
-                title:'OpenGPT',
+                title:'ChatGPT',
                 status: 'received',
                 text,
             }]
